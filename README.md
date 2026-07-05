@@ -165,6 +165,7 @@ Recommended first Alexa test path:
 2. Choose **Provision your own** backend.
 3. Set the invocation name to `nabu`.
 4. Import the interaction model from `skill/interaction-model/en-US.json`.
+   This model contains multiple carrier intents such as `what {query}` and `turn {query}` so Alexa routes free-form phrases to Home Assistant Assist instead of `AMAZON.FallbackIntent`.
 5. Copy the Alexa Skill ID.
 6. In Home Assistant, open **Settings -> Devices & services -> Alexa Assist Bridge -> Configure** and paste the Alexa Skill ID exactly.
 7. Set the Alexa endpoint type to **HTTPS**.
@@ -262,6 +263,7 @@ Common issues:
 - Home Assistant unreachable from Lambda
 - Alexa session timeout
 - Incorrect Alexa intent model
+- Alexa routes requests to `AMAZON.FallbackIntent`; re-import `skill/interaction-model/en-US.json`, save, and build the model
 
 ## Security
 

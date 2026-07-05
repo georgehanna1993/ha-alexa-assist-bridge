@@ -54,6 +54,44 @@ class AlexaHelperTest(unittest.TestCase):
 
         self.assertEqual(extract_alexa_query(payload), "turn off the TV")
 
+    def test_reconstructs_question_intent_prefix(self) -> None:
+        """Question carrier intents are reconstructed for Assist."""
+        payload = {
+            "request": {
+                "type": "IntentRequest",
+                "intent": {
+                    "name": "AskAssistWhatIntent",
+                    "slots": {
+                        "query": {
+                            "name": "query",
+                            "value": "lights are on",
+                        }
+                    },
+                },
+            }
+        }
+
+        self.assertEqual(extract_alexa_query(payload), "what lights are on")
+
+    def test_reconstructs_action_intent_prefix(self) -> None:
+        """Action carrier intents are reconstructed for Assist."""
+        payload = {
+            "request": {
+                "type": "IntentRequest",
+                "intent": {
+                    "name": "AskAssistTurnIntent",
+                    "slots": {
+                        "query": {
+                            "name": "query",
+                            "value": "off the TV",
+                        }
+                    },
+                },
+            }
+        }
+
+        self.assertEqual(extract_alexa_query(payload), "turn off the TV")
+
     def test_launch_request_raises_for_help_response(self) -> None:
         """LaunchRequest should produce help instead of forwarding empty text."""
         with self.assertRaises(AlexaRequestError):

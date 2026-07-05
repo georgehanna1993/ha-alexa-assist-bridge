@@ -4,6 +4,21 @@ from __future__ import annotations
 
 from typing import Any
 
+_ASSIST_INTENT_PREFIXES = {
+    "AskAssistIntent": "",
+    "AskAssistWhatIntent": "what",
+    "AskAssistWhyIntent": "why",
+    "AskAssistHowIntent": "how",
+    "AskAssistWhereIntent": "where",
+    "AskAssistWhenIntent": "when",
+    "AskAssistIsIntent": "is",
+    "AskAssistAreIntent": "are",
+    "AskAssistTurnIntent": "turn",
+    "AskAssistSetIntent": "set",
+    "AskAssistOpenIntent": "open",
+    "AskAssistCloseIntent": "close",
+}
+
 
 class AlexaRequestError(ValueError):
     """Raised when an Alexa request cannot be handled."""
@@ -30,7 +45,7 @@ def extract_alexa_query(payload: dict[str, Any]) -> str:
     if intent_name in {"AMAZON.HelpIntent", "AMAZON.FallbackIntent"}:
         raise AlexaRequestError(f"{intent_name} does not contain a query")
 
-    if intent_name != "AskAssistIntent":
+    if intent_name not in _ASSIST_INTENT_PREFIXES:
         raise AlexaRequestError(f"Unsupported intent: {intent_name}")
 
     query = (
@@ -39,9 +54,9 @@ def extract_alexa_query(payload: dict[str, Any]) -> str:
         .get("value")
     )
     if not isinstance(query, str):
-        raise AlexaRequestError("AskAssistIntent did not include query text")
+        raise AlexaRequestError(f"{intent_name} did not include query text")
 
-    return query.strip()
+    return _query_with_prefix(_ASSIST_INTENT_PREFIXES[intent_name], query)
 
 
 def is_stop_or_cancel_request(payload: dict[str, Any]) -> bool:
@@ -97,3 +112,13 @@ def _clean_speech_text(text: str) -> str:
     if not speech:
         return "I did not get a response from Home Assistant."
     return speech[:8000]
+
+
+def _query_with_prefix(prefix: str, query: str) -> str:
+    """Reconstruct the natural phrase from an Alexa carrier phrase sample."""
+    clean_query = query.strip()
+    if not prefix:
+        return clean_query
+    if clean_query.lower().startswith(f"{prefix} "):
+        return clean_query
+    return f"{prefix} {clean_query}".strip()

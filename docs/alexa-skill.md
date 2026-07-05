@@ -34,7 +34,9 @@ Use the starter model in:
 skill/interaction-model/en-US.json
 ```
 
-The first implementation uses a catch-all `AMAZON.SearchQuery` slot so Alexa passes the user's request text to Home Assistant Assist.
+The interaction model uses `AMAZON.SearchQuery` slots with multiple carrier intents, such as `what {query}` and `turn {query}`, so Alexa passes the user's request text to Home Assistant Assist.
+
+If the Alexa simulator shows `AMAZON.FallbackIntent` in JSON Input, re-import the interaction model, save it, and build the model again.
 
 ## Endpoint
 
