@@ -11,3 +11,4 @@ This project follows Semantic Versioning.
 - Add local debug endpoint for Assist forwarding.
 - Add Alexa web-service request validation for public HTTPS endpoints.
 - Add options flow for updating Skill ID, endpoint ID, Assist agent, language, and debug mode.
+- Add configurable assistant display name and authenticated last-request diagnostics.

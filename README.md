@@ -22,6 +22,8 @@ Current scope:
 - Local debug HTTP endpoint for testing Assist forwarding
 - Alexa request parsing and response formatting
 - Alexa web-service request validation
+- Configurable assistant display name
+- Authenticated last-request diagnostics endpoint
 - HACS-compatible repository layout
 - Alexa custom skill interaction model placeholder
 - Architecture and setup documentation
@@ -107,6 +109,7 @@ During setup, Home Assistant asks for:
 
 - `Alexa Skill ID`: leave blank for local debug testing.
 - `Conversation agent ID`: usually `conversation.home_assistant`.
+- `Assistant name`: the name used in help responses, for example `Nabu`.
 - `Endpoint ID`: keep the generated value unless you know why you want to change it.
 - `Language`: usually `en`.
 - `Allow unsigned local debug requests`: enable for local testing only.
@@ -147,6 +150,18 @@ Expected shape:
 
 Unsigned debug requests are accepted only when the debug header is present, the caller is loopback/private network, and debug mode is enabled in the integration config entry. Do not expose unsigned debug requests through Nabu Casa.
 
+## Diagnostics
+
+The integration exposes an authenticated diagnostics endpoint for troubleshooting.
+
+Replace `HA_LOCAL_URL` and `YOUR_ENDPOINT_ID`:
+
+```text
+HA_LOCAL_URL/api/alexa_assist_bridge/YOUR_ENDPOINT_ID/diagnostics
+```
+
+This endpoint requires Home Assistant authentication. It reports the last request type, last intent name, validation status, final status, and last error. It does not store the full spoken query.
+
 ## Alexa Developer Console
 
 The Alexa Skill cannot be installed by HACS. It must be created in Amazon's Alexa Developer Console.
@@ -180,6 +195,8 @@ Recommended first Alexa test path:
    ```text
    ask nabu what lights are on
    ```
+
+The no-AWS Nabu Casa HTTPS path has been tested successfully with the Alexa simulator and an Echo device.
 
 Required values:
 
@@ -264,6 +281,7 @@ Common issues:
 - Alexa session timeout
 - Incorrect Alexa intent model
 - Alexa routes requests to `AMAZON.FallbackIntent`; re-import `skill/interaction-model/en-US.json`, save, and build the model
+- Home Assistant returns help text for routed intents; redownload the HACS integration and restart Home Assistant so the latest parser code is loaded
 
 ## Security
 

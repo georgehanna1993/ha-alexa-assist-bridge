@@ -65,3 +65,15 @@ ask nabu what lights are on
 ```
 
 Alexa public requests are validated with the Alexa Skill ID, timestamp freshness, certificate-chain URL checks, certificate validity, and request signature verification. Keep unsigned debug requests for local LAN testing only.
+
+## Common Routing Issue
+
+If JSON Input shows:
+
+```text
+AMAZON.FallbackIntent
+```
+
+Alexa did not route the phrase to the bridge intent. Re-import `skill/interaction-model/en-US.json`, save the model, and build it again.
+
+If JSON Input shows an `AskAssist...Intent` but Alexa still returns help text, Home Assistant is probably running old integration code. Redownload the integration in HACS and restart Home Assistant.

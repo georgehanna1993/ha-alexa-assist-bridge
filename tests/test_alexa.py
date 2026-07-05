@@ -21,6 +21,7 @@ _SPEC.loader.exec_module(alexa_helpers)
 
 AlexaRequestError = alexa_helpers.AlexaRequestError
 alexa_plain_text_response = alexa_helpers.alexa_plain_text_response
+alexa_help_response = alexa_helpers.alexa_help_response
 extract_alexa_query = alexa_helpers.extract_alexa_query
 is_stop_or_cancel_request = alexa_helpers.is_stop_or_cancel_request
 
@@ -126,6 +127,15 @@ class AlexaHelperTest(unittest.TestCase):
                     "shouldEndSession": False,
                 },
             },
+        )
+
+    def test_help_response_uses_assistant_name(self) -> None:
+        """Help responses can use the configured assistant name."""
+        response = alexa_help_response("Home Helper")
+
+        self.assertEqual(
+            response["response"]["outputSpeech"]["text"],
+            "Ask Home Helper a Home Assistant question, like what lights are on.",
         )
 
 

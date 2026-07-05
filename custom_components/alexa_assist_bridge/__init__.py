@@ -5,7 +5,12 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
+from .const import (
+    CONF_ASSISTANT_NAME,
+    DEFAULT_ASSISTANT_NAME,
+    DOMAIN,
+)
+from .diagnostics import initial_diagnostics
 from .http import async_register_http_view
 
 type AlexaAssistBridgeConfigEntry = ConfigEntry
@@ -26,7 +31,10 @@ async def async_setup_entry(
 ) -> bool:
     """Set up Alexa Assist Bridge from a config entry."""
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = _entry_config(entry)
+    hass.data[DOMAIN][entry.entry_id] = {
+        "config": _entry_config(entry),
+        "diagnostics": initial_diagnostics(),
+    }
     async_register_http_view(hass)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
@@ -53,4 +61,8 @@ async def _async_update_listener(
 
 def _entry_config(entry: AlexaAssistBridgeConfigEntry) -> dict:
     """Merge setup data and options, with options taking precedence."""
-    return {**entry.data, **entry.options}
+    return {
+        CONF_ASSISTANT_NAME: DEFAULT_ASSISTANT_NAME,
+        **entry.data,
+        **entry.options,
+    }

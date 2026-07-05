@@ -22,11 +22,18 @@ from .assist import async_process_assist
 from .const import (
     CONF_AGENT_ID,
     CONF_ALLOW_DEBUG_REQUESTS,
+    CONF_ASSISTANT_NAME,
     CONF_ENDPOINT_ID,
     CONF_LANGUAGE,
     DEFAULT_AGENT_ID,
+    DEFAULT_ASSISTANT_NAME,
     DEFAULT_LANGUAGE,
     DOMAIN,
+)
+from .diagnostics import (
+    record_request,
+    record_status,
+    record_validation,
 )
 from .security import AlexaSecurityError, async_validate_alexa_request
 
@@ -41,6 +48,7 @@ def async_register_http_view(hass: HomeAssistant) -> None:
         return
 
     hass.http.register_view(AlexaAssistBridgeView)
+    hass.http.register_view(AlexaAssistBridgeDiagnosticsView)
     hass.data[_VIEW_REGISTERED] = True
 
 
@@ -54,25 +62,31 @@ class AlexaAssistBridgeView(HomeAssistantView):
     async def post(self, request: web.Request, endpoint_id: str) -> web.Response:
         """Handle an Alexa Skill request."""
         hass: HomeAssistant = request.app["hass"]
-        entry = _entry_for_endpoint(hass, endpoint_id)
-        if entry is None:
+        runtime = _runtime_for_endpoint(hass, endpoint_id)
+        if runtime is None:
             return web.json_response(
                 alexa_error_response("Unknown Alexa Assist Bridge endpoint."),
                 status=404,
             )
 
+        config = runtime["config"]
+        diagnostics = runtime["diagnostics"]
         raw_body = await request.read()
         try:
             payload = await request.json()
         except ValueError:
+            record_status(
+                diagnostics,
+                "invalid_json",
+                error="The request body was not valid JSON.",
+            )
             return web.json_response(
                 alexa_error_response("The request body was not valid JSON."),
                 status=400,
             )
 
-        allow_debug_requests = bool(
-            entry.get(CONF_ALLOW_DEBUG_REQUESTS, False)
-        )
+        record_request(diagnostics, payload)
+        allow_debug_requests = bool(config.get(CONF_ALLOW_DEBUG_REQUESTS, False))
 
         try:
             await async_validate_alexa_request(
@@ -80,37 +94,50 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 request=request,
                 payload=payload,
                 raw_body=raw_body,
-                configured_skill_id=entry.get("alexa_skill_id", ""),
+                configured_skill_id=config.get("alexa_skill_id", ""),
                 allow_debug_requests=allow_debug_requests,
             )
         except AlexaSecurityError as err:
             _LOGGER.warning("Rejected Alexa request: %s", err)
+            record_validation(diagnostics, "failed")
+            record_status(diagnostics, "rejected", error=str(err))
             return web.json_response(
                 alexa_error_response("The Alexa request was rejected."),
                 status=400,
             )
 
+        record_validation(diagnostics, "passed")
+        assistant_name = config.get(CONF_ASSISTANT_NAME, DEFAULT_ASSISTANT_NAME)
+
         try:
             if is_stop_or_cancel_request(payload):
+                record_status(diagnostics, "ok", response_length=len("Goodbye."))
                 return web.json_response(alexa_plain_text_response("Goodbye."))
 
             query = extract_alexa_query(payload)
-        except AlexaRequestError:
-            return web.json_response(alexa_help_response())
+        except AlexaRequestError as err:
+            record_status(diagnostics, "help", error=str(err))
+            return web.json_response(alexa_help_response(assistant_name))
 
         if not query:
-            return web.json_response(alexa_help_response())
+            record_status(diagnostics, "help", error="Empty query")
+            return web.json_response(alexa_help_response(assistant_name))
 
         try:
             result = await async_process_assist(
                 hass=hass,
                 text=query,
                 conversation_id=_conversation_id(payload),
-                agent_id=entry.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
-                language=entry.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+                agent_id=config.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
+                language=config.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
             )
         except Exception:
             _LOGGER.exception("Assist processing failed")
+            record_status(
+                diagnostics,
+                "assist_error",
+                error="Home Assistant had trouble processing that request.",
+            )
             return web.json_response(
                 alexa_error_response(
                     "Home Assistant had trouble processing that request."
@@ -118,6 +145,11 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 status=500,
             )
 
+        record_status(
+            diagnostics,
+            "ok",
+            response_length=len(result.speech),
+        )
         return web.json_response(
             alexa_plain_text_response(
                 result.speech,
@@ -126,14 +158,49 @@ class AlexaAssistBridgeView(HomeAssistantView):
         )
 
 
-def _entry_for_endpoint(
+class AlexaAssistBridgeDiagnosticsView(HomeAssistantView):
+    """Return last-request diagnostics for an endpoint."""
+
+    url = "/api/alexa_assist_bridge/{endpoint_id}/diagnostics"
+    name = "api:alexa_assist_bridge:diagnostics"
+    requires_auth = True
+
+    async def get(self, request: web.Request, endpoint_id: str) -> web.Response:
+        """Handle a diagnostics request."""
+        hass: HomeAssistant = request.app["hass"]
+        runtime = _runtime_for_endpoint(hass, endpoint_id)
+        if runtime is None:
+            return web.json_response(
+                {"error": "Unknown Alexa Assist Bridge endpoint."},
+                status=404,
+            )
+
+        config = runtime["config"]
+        return web.json_response(
+            {
+                "endpoint_id": config.get(CONF_ENDPOINT_ID),
+                "assistant_name": config.get(
+                    CONF_ASSISTANT_NAME,
+                    DEFAULT_ASSISTANT_NAME,
+                ),
+                "agent_id": config.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
+                "language": config.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+                "allow_debug_requests": bool(
+                    config.get(CONF_ALLOW_DEBUG_REQUESTS, False)
+                ),
+                "diagnostics": runtime["diagnostics"],
+            }
+        )
+
+
+def _runtime_for_endpoint(
     hass: HomeAssistant,
     endpoint_id: str,
 ) -> dict[str, Any] | None:
-    """Find the config entry data for an endpoint id."""
-    for entry_data in hass.data.get(DOMAIN, {}).values():
-        if entry_data.get(CONF_ENDPOINT_ID) == endpoint_id:
-            return entry_data
+    """Find the runtime data for an endpoint id."""
+    for runtime in hass.data.get(DOMAIN, {}).values():
+        if runtime["config"].get(CONF_ENDPOINT_ID) == endpoint_id:
+            return runtime
     return None
 
 

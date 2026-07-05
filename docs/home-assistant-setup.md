@@ -60,3 +60,15 @@ Settings -> Devices & services -> Alexa Assist Bridge -> Configure
 ```
 
 Paste the Alexa Skill ID exactly as shown in the Alexa Developer Console.
+
+You can also update the assistant display name here. This controls help text only; Alexa recognition is controlled by the invocation name in the Alexa Developer Console.
+
+## Diagnostics
+
+After signing in to Home Assistant, open:
+
+```text
+HA_LOCAL_URL/api/alexa_assist_bridge/YOUR_ENDPOINT_ID/diagnostics
+```
+
+The response shows the last request type, intent name, validation result, status, and error without storing the full utterance.

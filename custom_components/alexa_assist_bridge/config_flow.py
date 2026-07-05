@@ -15,10 +15,12 @@ from .const import (
     CONF_ALEXA_SKILL_ID,
     CONF_ALLOW_DEBUG_REQUESTS,
     CONF_AGENT_ID,
+    CONF_ASSISTANT_NAME,
     CONF_ENDPOINT_ID,
     CONF_LANGUAGE,
     DEFAULT_AGENT_ID,
     DEFAULT_ALLOW_DEBUG_REQUESTS,
+    DEFAULT_ASSISTANT_NAME,
     DEFAULT_LANGUAGE,
     DOMAIN,
 )
@@ -48,6 +50,7 @@ class AlexaAssistBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_ALEXA_SKILL_ID: user_input.get(CONF_ALEXA_SKILL_ID, "").strip(),
                 CONF_ALLOW_DEBUG_REQUESTS: user_input[CONF_ALLOW_DEBUG_REQUESTS],
                 CONF_AGENT_ID: user_input[CONF_AGENT_ID].strip(),
+                CONF_ASSISTANT_NAME: user_input[CONF_ASSISTANT_NAME].strip(),
                 CONF_ENDPOINT_ID: user_input[CONF_ENDPOINT_ID].strip(),
                 CONF_LANGUAGE: user_input[CONF_LANGUAGE].strip(),
             }
@@ -60,6 +63,10 @@ class AlexaAssistBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(
                     CONF_AGENT_ID,
                     default=DEFAULT_AGENT_ID,
+                ): str,
+                vol.Required(
+                    CONF_ASSISTANT_NAME,
+                    default=DEFAULT_ASSISTANT_NAME,
                 ): str,
                 vol.Required(
                     CONF_ENDPOINT_ID,
@@ -114,6 +121,7 @@ class AlexaAssistBridgeOptionsFlow(config_entries.OptionsFlow):
                     ).strip(),
                     CONF_ALLOW_DEBUG_REQUESTS: user_input[CONF_ALLOW_DEBUG_REQUESTS],
                     CONF_AGENT_ID: user_input[CONF_AGENT_ID].strip(),
+                    CONF_ASSISTANT_NAME: user_input[CONF_ASSISTANT_NAME].strip(),
                     CONF_ENDPOINT_ID: user_input[CONF_ENDPOINT_ID].strip(),
                     CONF_LANGUAGE: user_input[CONF_LANGUAGE].strip(),
                 },
@@ -128,6 +136,13 @@ class AlexaAssistBridgeOptionsFlow(config_entries.OptionsFlow):
                 vol.Required(
                     CONF_AGENT_ID,
                     default=current.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
+                ): str,
+                vol.Required(
+                    CONF_ASSISTANT_NAME,
+                    default=current.get(
+                        CONF_ASSISTANT_NAME,
+                        DEFAULT_ASSISTANT_NAME,
+                    ),
                 ): str,
                 vol.Required(
                     CONF_ENDPOINT_ID,

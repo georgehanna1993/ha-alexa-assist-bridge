@@ -37,6 +37,19 @@ Required checks:
 
 The current implementation forwards local debug requests only when the debug header is present, the caller is loopback/private network, and debug mode is explicitly enabled. Public Alexa requests must pass full request validation.
 
+## Diagnostics
+
+The integration keeps lightweight runtime diagnostics for the most recent request:
+
+- request time
+- request type
+- intent name
+- validation result
+- final status
+- short error message
+
+It does not store the full user utterance.
+
 ## Optional Lambda Path
 
 Lambda remains useful for users who prefer Amazon-native skill hosting or who cannot expose Home Assistant through Nabu Casa.

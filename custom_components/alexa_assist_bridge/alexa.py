@@ -87,10 +87,10 @@ def alexa_plain_text_response(
     }
 
 
-def alexa_help_response() -> dict[str, Any]:
+def alexa_help_response(assistant_name: str = "Nabu") -> dict[str, Any]:
     """Build the help response."""
     return alexa_plain_text_response(
-        "Ask Nabu a Home Assistant question, like what lights are on.",
+        f"Ask {assistant_name} a Home Assistant question, like what lights are on.",
         should_end_session=False,
     )
 
