@@ -65,6 +65,8 @@ You can also update the assistant display name here. This controls help text onl
 
 ## Diagnostics
 
+The integration creates a diagnostic entity named **Alexa Assist Bridge Status**. Use it to check whether the most recent request was accepted, rejected, routed to help, or failed while calling Assist.
+
 After signing in to Home Assistant, open:
 
 ```text

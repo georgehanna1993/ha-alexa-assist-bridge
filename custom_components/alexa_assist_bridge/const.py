@@ -13,3 +13,5 @@ DEFAULT_AGENT_ID = "conversation.home_assistant"
 DEFAULT_ASSISTANT_NAME = "Nabu"
 DEFAULT_LANGUAGE = "en"
 DEFAULT_ALLOW_DEBUG_REQUESTS = True
+
+SIGNAL_DIAGNOSTICS_UPDATED = f"{DOMAIN}_diagnostics_updated"

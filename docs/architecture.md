@@ -39,7 +39,7 @@ The current implementation forwards local debug requests only when the debug hea
 
 ## Diagnostics
 
-The integration keeps lightweight runtime diagnostics for the most recent request:
+The integration keeps lightweight runtime diagnostics for the most recent request and exposes them through a diagnostic sensor plus an authenticated diagnostics endpoint:
 
 - request time
 - request type

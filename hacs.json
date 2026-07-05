@@ -1,7 +1,7 @@
 {
   "name": "Alexa Assist Bridge",
   "render_readme": true,
-  "domains": ["conversation"],
+  "domains": ["conversation", "sensor"],
   "homeassistant": "2026.6.0",
   "iot_class": "cloud_push"
 }

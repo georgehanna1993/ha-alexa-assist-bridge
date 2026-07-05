@@ -9,6 +9,7 @@ from aiohttp import web
 
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .alexa import (
     AlexaRequestError,
@@ -29,6 +30,7 @@ from .const import (
     DEFAULT_ASSISTANT_NAME,
     DEFAULT_LANGUAGE,
     DOMAIN,
+    SIGNAL_DIAGNOSTICS_UPDATED,
 )
 from .diagnostics import (
     record_request,
@@ -80,6 +82,7 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 "invalid_json",
                 error="The request body was not valid JSON.",
             )
+            _notify_diagnostics_update(hass, runtime)
             return web.json_response(
                 alexa_error_response("The request body was not valid JSON."),
                 status=400,
@@ -101,6 +104,7 @@ class AlexaAssistBridgeView(HomeAssistantView):
             _LOGGER.warning("Rejected Alexa request: %s", err)
             record_validation(diagnostics, "failed")
             record_status(diagnostics, "rejected", error=str(err))
+            _notify_diagnostics_update(hass, runtime)
             return web.json_response(
                 alexa_error_response("The Alexa request was rejected."),
                 status=400,
@@ -112,15 +116,18 @@ class AlexaAssistBridgeView(HomeAssistantView):
         try:
             if is_stop_or_cancel_request(payload):
                 record_status(diagnostics, "ok", response_length=len("Goodbye."))
+                _notify_diagnostics_update(hass, runtime)
                 return web.json_response(alexa_plain_text_response("Goodbye."))
 
             query = extract_alexa_query(payload)
         except AlexaRequestError as err:
             record_status(diagnostics, "help", error=str(err))
+            _notify_diagnostics_update(hass, runtime)
             return web.json_response(alexa_help_response(assistant_name))
 
         if not query:
             record_status(diagnostics, "help", error="Empty query")
+            _notify_diagnostics_update(hass, runtime)
             return web.json_response(alexa_help_response(assistant_name))
 
         try:
@@ -138,6 +145,7 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 "assist_error",
                 error="Home Assistant had trouble processing that request.",
             )
+            _notify_diagnostics_update(hass, runtime)
             return web.json_response(
                 alexa_error_response(
                     "Home Assistant had trouble processing that request."
@@ -150,6 +158,7 @@ class AlexaAssistBridgeView(HomeAssistantView):
             "ok",
             response_length=len(result.speech),
         )
+        _notify_diagnostics_update(hass, runtime)
         return web.json_response(
             alexa_plain_text_response(
                 result.speech,
@@ -202,6 +211,17 @@ def _runtime_for_endpoint(
         if runtime["config"].get(CONF_ENDPOINT_ID) == endpoint_id:
             return runtime
     return None
+
+
+def _notify_diagnostics_update(
+    hass: HomeAssistant,
+    runtime: dict[str, Any],
+) -> None:
+    """Notify listeners that runtime diagnostics changed."""
+    async_dispatcher_send(
+        hass,
+        f"{SIGNAL_DIAGNOSTICS_UPDATED}_{runtime['entry_id']}",
+    )
 
 
 def _conversation_id(payload: dict[str, Any]) -> str | None:

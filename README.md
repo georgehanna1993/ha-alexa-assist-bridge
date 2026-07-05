@@ -24,6 +24,7 @@ Current scope:
 - Alexa web-service request validation
 - Configurable assistant display name
 - Authenticated last-request diagnostics endpoint
+- Diagnostic status sensor in Home Assistant
 - HACS-compatible repository layout
 - Alexa custom skill interaction model placeholder
 - Architecture and setup documentation
@@ -152,7 +153,21 @@ Unsigned debug requests are accepted only when the debug header is present, the 
 
 ## Diagnostics
 
-The integration exposes an authenticated diagnostics endpoint for troubleshooting.
+The integration creates a diagnostic status sensor in Home Assistant. Its state is the latest request status, such as:
+
+```text
+never_called
+received
+ok
+help
+rejected
+assist_error
+invalid_json
+```
+
+The sensor attributes include the last request type, intent name, validation result, short error, and response length. It does not store the full spoken query.
+
+The integration also exposes an authenticated diagnostics endpoint for troubleshooting.
 
 Replace `HA_LOCAL_URL` and `YOUR_ENDPOINT_ID`:
 

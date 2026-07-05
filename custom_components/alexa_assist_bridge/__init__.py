@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
 from .const import (
@@ -14,6 +15,8 @@ from .diagnostics import initial_diagnostics
 from .http import async_register_http_view
 
 type AlexaAssistBridgeConfigEntry = ConfigEntry
+
+PLATFORMS: tuple[Platform, ...] = (Platform.SENSOR,)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -32,11 +35,13 @@ async def async_setup_entry(
     """Set up Alexa Assist Bridge from a config entry."""
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
+        "entry_id": entry.entry_id,
         "config": _entry_config(entry),
         "diagnostics": initial_diagnostics(),
     }
     async_register_http_view(hass)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
@@ -45,6 +50,10 @@ async def async_unload_entry(
     entry: AlexaAssistBridgeConfigEntry,
 ) -> bool:
     """Unload Alexa Assist Bridge config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if not unload_ok:
+        return False
+
     hass.data[DOMAIN].pop(entry.entry_id, None)
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
