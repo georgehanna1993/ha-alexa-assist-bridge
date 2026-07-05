@@ -66,6 +66,8 @@ For LLM-backed agents, the bridge can optionally wrap each request with concise 
 
 Live web search depends on the selected Home Assistant conversation agent or future optional tools.
 
+Launch requests are handled locally by the bridge. `Alexa, open Nabu` returns an open-session greeting and does not call Home Assistant Assist until the user asks the first question.
+
 ## Optional Lambda Path
 
 Lambda remains useful for users who prefer Amazon-native skill hosting or who cannot expose Home Assistant through Nabu Casa.

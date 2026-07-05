@@ -15,8 +15,10 @@ from .alexa import (
     AlexaRequestError,
     alexa_error_response,
     alexa_help_response,
+    alexa_launch_response,
     alexa_plain_text_response,
     extract_alexa_query,
+    is_launch_request,
     is_stop_or_cancel_request,
 )
 from .assist import async_process_assist
@@ -131,6 +133,18 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 )
                 _notify_diagnostics_update(hass, runtime)
                 return web.json_response(alexa_plain_text_response("Goodbye."))
+
+            if is_launch_request(payload):
+                response_text = f"Hi, I'm {assistant_name}. What do you want to ask?"
+                record_status(
+                    diagnostics,
+                    "launch",
+                    response_length=len(response_text),
+                    should_end_session=False,
+                    conversation_id_present=bool(_conversation_id(payload)),
+                )
+                _notify_diagnostics_update(hass, runtime)
+                return web.json_response(alexa_launch_response(assistant_name))
 
             query = extract_alexa_query(payload)
         except AlexaRequestError as err:

@@ -10,6 +10,7 @@ Example:
 Alexa, ask Nabu what lights are on.
 Alexa, ask Nabu what's on my calendar today.
 Alexa, ask Nabu turn off the TV.
+Alexa, open Nabu.
 ```
 
 ## Project Status
@@ -132,6 +133,14 @@ The bridge supports three Alexa session behaviors:
 For a reasoning/chat experience, use an LLM conversation agent such as Gemini/OpenAI/Ollama and set conversation mode to `always` or `assist`.
 When Alexa keeps the session open, the bridge adds a short spoken cue such as `Anything else?` after successful answers so users have a natural moment to continue.
 
+You can also start chat mode with:
+
+```text
+Alexa, open Nabu
+```
+
+The bridge responds with a short greeting and waits for your first question.
+
 ### Reasoning And Chat
 
 Alexa already supports basic smart-home commands. This bridge is most useful when Home Assistant Assist is backed by a real conversation agent:
@@ -240,6 +249,12 @@ Recommended first Alexa test path:
 
    ```text
    ask nabu what lights are on
+   ```
+
+   Or start chat mode:
+
+   ```text
+   open nabu
    ```
 
 The no-AWS Nabu Casa HTTPS path has been tested successfully with the Alexa simulator and an Echo device.

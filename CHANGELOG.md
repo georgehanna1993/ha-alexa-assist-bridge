@@ -17,3 +17,4 @@ This project follows Semantic Versioning.
 - Add optional spoken-response prompt optimization for LLM conversation agents.
 - Include session-continuation diagnostics in the status sensor and diagnostics endpoint.
 - Add a short spoken follow-up cue for open Alexa chat sessions.
+- Add LaunchRequest chat mode for `Alexa, open Nabu`.

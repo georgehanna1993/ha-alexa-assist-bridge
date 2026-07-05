@@ -69,6 +69,12 @@ def is_stop_or_cancel_request(payload: dict[str, Any]) -> bool:
     return intent_name in {"AMAZON.CancelIntent", "AMAZON.StopIntent"}
 
 
+def is_launch_request(payload: dict[str, Any]) -> bool:
+    """Return true if the request opens the skill without a query."""
+    request = payload.get("request", {})
+    return request.get("type") == "LaunchRequest"
+
+
 def alexa_plain_text_response(
     text: str,
     *,
@@ -108,6 +114,15 @@ def alexa_help_response(assistant_name: str = "Nabu") -> dict[str, Any]:
         f"Ask {assistant_name} a Home Assistant question, like what lights are on.",
         should_end_session=False,
         reprompt_text="What would you like to ask?",
+    )
+
+
+def alexa_launch_response(assistant_name: str = "Nabu") -> dict[str, Any]:
+    """Build the open-chat launch response."""
+    return alexa_plain_text_response(
+        f"Hi, I'm {assistant_name}. What do you want to ask?",
+        should_end_session=False,
+        reprompt_text=f"What would you like to ask {assistant_name}?",
     )
 
 

@@ -64,6 +64,14 @@ Use the Alexa simulator with:
 ask nabu what lights are on
 ```
 
+To start an open chat session, test:
+
+```text
+open nabu
+```
+
+The skill should greet you and keep the session open for your first question.
+
 Alexa public requests are validated with the Alexa Skill ID, timestamp freshness, certificate-chain URL checks, certificate validity, and request signature verification. Keep unsigned debug requests for local LAN testing only.
 
 ## Common Routing Issue

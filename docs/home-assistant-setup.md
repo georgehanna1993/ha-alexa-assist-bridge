@@ -60,6 +60,14 @@ For an Alexa+-like chat experience, start with `always`. You can still say `stop
 
 When the session stays open, the bridge adds a short spoken cue such as `Anything else?` after successful answers. Amazon controls the exact microphone timeout, but the cue makes follow-up turns feel more reliable.
 
+You can start chat mode from Alexa with:
+
+```text
+Alexa, open Nabu
+```
+
+The bridge responds with a short greeting and waits for your first question.
+
 ## Spoken LLM Prompting
 
 When enabled, the bridge adds voice-oriented instructions before sending a request to non-default LLM agents. This helps Gemini/OpenAI/Ollama answer briefly and naturally through Alexa.

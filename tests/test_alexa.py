@@ -22,7 +22,9 @@ _SPEC.loader.exec_module(alexa_helpers)
 AlexaRequestError = alexa_helpers.AlexaRequestError
 alexa_plain_text_response = alexa_helpers.alexa_plain_text_response
 alexa_help_response = alexa_helpers.alexa_help_response
+alexa_launch_response = alexa_helpers.alexa_launch_response
 extract_alexa_query = alexa_helpers.extract_alexa_query
+is_launch_request = alexa_helpers.is_launch_request
 is_stop_or_cancel_request = alexa_helpers.is_stop_or_cancel_request
 
 
@@ -111,6 +113,20 @@ class AlexaHelperTest(unittest.TestCase):
             )
         )
 
+    def test_detects_launch_request(self) -> None:
+        """LaunchRequest should open chat mode."""
+        self.assertTrue(is_launch_request({"request": {"type": "LaunchRequest"}}))
+        self.assertFalse(
+            is_launch_request(
+                {
+                    "request": {
+                        "type": "IntentRequest",
+                        "intent": {"name": "AskAssistIntent"},
+                    }
+                }
+            )
+        )
+
     def test_plain_text_response_shape(self) -> None:
         """Alexa responses include the expected outputSpeech shape."""
         response = alexa_plain_text_response("Done", should_end_session=False)
@@ -140,6 +156,20 @@ class AlexaHelperTest(unittest.TestCase):
         self.assertEqual(
             response["response"]["reprompt"]["outputSpeech"]["text"],
             "What would you like to ask?",
+        )
+
+    def test_launch_response_opens_chat_mode(self) -> None:
+        """Launch responses should keep the session open for the first question."""
+        response = alexa_launch_response("Home Helper")
+
+        self.assertEqual(
+            response["response"]["outputSpeech"]["text"],
+            "Hi, I'm Home Helper. What do you want to ask?",
+        )
+        self.assertFalse(response["response"]["shouldEndSession"])
+        self.assertEqual(
+            response["response"]["reprompt"]["outputSpeech"]["text"],
+            "What would you like to ask Home Helper?",
         )
 
     def test_reprompt_is_included_when_session_stays_open(self) -> None:
