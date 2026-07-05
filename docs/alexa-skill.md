@@ -13,7 +13,7 @@
 Recommended examples:
 
 ```text
-jarvis
+nabu
 home assistant
 my home
 ```
@@ -21,9 +21,9 @@ my home
 Example phrases:
 
 ```text
-Alexa, ask Jarvis what lights are on.
-Alexa, ask Jarvis turn off the TV.
-Alexa, open Jarvis.
+Alexa, ask Nabu what lights are on.
+Alexa, ask Nabu turn off the TV.
+Alexa, open Nabu.
 ```
 
 ## Interaction Model
@@ -44,4 +44,4 @@ For the recommended no-AWS path, the endpoint will be your Home Assistant Cloud 
 https://YOUR-NABU-CASA-REMOTE-URL.ui.nabu.casa/api/alexa_assist_bridge/YOUR_ENDPOINT_ID
 ```
 
-The endpoint is not implemented yet. Do not expose development endpoints until request validation is complete.
+The local debug endpoint exists for LAN testing, but public Alexa signature verification is not complete yet. Do not expose unsigned debug requests through Nabu Casa.

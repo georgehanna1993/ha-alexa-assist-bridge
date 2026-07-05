@@ -33,7 +33,7 @@ Required checks:
 - Signature certificate URL is valid for Alexa.
 - Request signature matches the body.
 
-Until these checks exist, the endpoint must not forward requests to Assist.
+The current implementation forwards local debug requests only when the debug header is present, the caller is loopback/private network, and debug mode is explicitly enabled. Public requests are rejected until full Alexa signature verification is complete.
 
 ## Optional Lambda Path
 

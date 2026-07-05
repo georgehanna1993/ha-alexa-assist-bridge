@@ -6,6 +6,11 @@
         "description": "Create a bridge endpoint for an Alexa custom skill. Leave the Skill ID blank while developing, then add it before exposing the endpoint.",
         "data": {
           "alexa_skill_id": "Alexa Skill ID"
+          ,
+          "agent_id": "Conversation agent ID",
+          "endpoint_id": "Endpoint ID",
+          "language": "Language",
+          "allow_debug_requests": "Allow unsigned local debug requests"
         }
       }
     },

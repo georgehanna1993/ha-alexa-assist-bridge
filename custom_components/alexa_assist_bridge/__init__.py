@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
+from .http import async_register_http_view
 
 type AlexaAssistBridgeConfigEntry = ConfigEntry
 
@@ -17,6 +18,7 @@ async def async_setup_entry(
     """Set up Alexa Assist Bridge from a config entry."""
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = entry.data
+    async_register_http_view(hass)
     return True
 
 

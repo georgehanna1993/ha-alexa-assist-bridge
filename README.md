@@ -7,9 +7,9 @@ This project is for users who want an Alexa+-like experience in places where Ale
 Example:
 
 ```text
-Alexa, ask Jarvis what lights are on.
-Alexa, ask Jarvis what's on my calendar today.
-Alexa, ask Jarvis turn off the TV.
+Alexa, ask Nabu what lights are on.
+Alexa, ask Nabu what's on my calendar today.
+Alexa, ask Nabu turn off the TV.
 ```
 
 ## Project Status
@@ -19,14 +19,15 @@ This repository is in early development.
 Current scope:
 
 - Home Assistant custom integration scaffold
+- Local debug HTTP endpoint for testing Assist forwarding
+- Alexa request parsing and response formatting
 - HACS-compatible repository layout
 - Alexa custom skill interaction model placeholder
 - Architecture and setup documentation
 
 Not yet implemented:
 
-- Alexa request validation
-- Home Assistant Assist request forwarding
+- Full Alexa public request signature validation
 - Optional AWS Lambda bridge
 - Release packaging
 
@@ -56,8 +57,8 @@ Replace `YOUR-NABU-CASA-REMOTE-URL` and `YOUR_ENDPOINT_ID` with values from your
 Amazon does not allow third-party projects to replace Alexa's built-in assistant on Echo devices. This project uses a custom skill invocation such as:
 
 ```text
-Alexa, ask Jarvis ...
-Alexa, open Jarvis ...
+Alexa, ask Nabu ...
+Alexa, open Nabu ...
 Alexa, ask Home Assistant ...
 ```
 
@@ -102,6 +103,48 @@ When custom repository installation is available:
 9. Go to **Settings -> Devices & services -> Add integration**.
 10. Search for **Alexa Assist Bridge**.
 
+During setup, Home Assistant asks for:
+
+- `Alexa Skill ID`: leave blank for local debug testing.
+- `Conversation agent ID`: usually `conversation.home_assistant`.
+- `Endpoint ID`: keep the generated value unless you know why you want to change it.
+- `Language`: usually `en`.
+- `Allow unsigned local debug requests`: enable for local testing only.
+
+## Local Testing
+
+After adding the integration, test from your local network before configuring Alexa.
+
+Replace:
+
+- `HA_LOCAL_URL` with your local Home Assistant URL, for example `http://homeassistant.local:8123`.
+- `YOUR_ENDPOINT_ID` with the endpoint ID shown during setup.
+
+```bash
+curl -X POST \
+  "HA_LOCAL_URL/api/alexa_assist_bridge/YOUR_ENDPOINT_ID" \
+  -H "Content-Type: application/json" \
+  -H "X-Alexa-Assist-Bridge-Debug: true" \
+  -d '{"query":"what lights are on?"}'
+```
+
+Expected shape:
+
+```json
+{
+  "version": "1.0",
+  "response": {
+    "outputSpeech": {
+      "type": "PlainText",
+      "text": "..."
+    },
+    "shouldEndSession": true
+  }
+}
+```
+
+Unsigned debug requests are accepted only when the debug header is present, the caller is loopback/private network, and debug mode is enabled in the integration config entry. Do not expose unsigned debug requests through Nabu Casa.
+
 ## Alexa Developer Console
 
 The Alexa Skill cannot be installed by HACS. It must be created in Amazon's Alexa Developer Console.
@@ -109,7 +152,7 @@ The Alexa Skill cannot be installed by HACS. It must be created in Amazon's Alex
 High-level steps:
 
 1. Create a custom skill.
-2. Choose an invocation name, for example `jarvis`.
+2. Choose an invocation name, for example `nabu`.
 3. Add a catch-all intent using `AMAZON.SearchQuery`.
 4. Configure the endpoint.
 5. Test with the Alexa simulator.
@@ -174,11 +217,11 @@ For Lambda fallback only:
 ## Testing Phrases
 
 ```text
-Alexa, ask Jarvis what lights are on.
-Alexa, ask Jarvis what's on today's calendar.
-Alexa, ask Jarvis why the living room is hot.
-Alexa, ask Jarvis turn off the TV.
-Alexa, ask Jarvis summarize yesterday's activity.
+Alexa, ask Nabu what lights are on.
+Alexa, ask Nabu what's on today's calendar.
+Alexa, ask Nabu why the living room is hot.
+Alexa, ask Nabu turn off the TV.
+Alexa, ask Nabu summarize yesterday's activity.
 ```
 
 ## Troubleshooting

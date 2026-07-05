@@ -31,3 +31,22 @@ Do not commit your real URL if you consider it private.
 Assist can only control and reason about what Home Assistant allows it to use.
 
 Review exposed entities in Home Assistant and keep the list intentional.
+
+## Local Debug Test
+
+The integration supports local unsigned debug requests so you can verify Assist forwarding before configuring Alexa.
+
+Replace:
+
+- `HA_LOCAL_URL` with your local Home Assistant URL.
+- `YOUR_ENDPOINT_ID` with the endpoint ID from the integration setup form.
+
+```bash
+curl -X POST \
+  "HA_LOCAL_URL/api/alexa_assist_bridge/YOUR_ENDPOINT_ID" \
+  -H "Content-Type: application/json" \
+  -H "X-Alexa-Assist-Bridge-Debug: true" \
+  -d '{"query":"what lights are on?"}'
+```
+
+Only keep unsigned debug requests enabled while testing locally.
