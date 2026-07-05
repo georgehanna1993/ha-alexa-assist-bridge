@@ -26,8 +26,9 @@ async def async_setup_entry(
 ) -> bool:
     """Set up Alexa Assist Bridge from a config entry."""
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = entry.data
+    hass.data[DOMAIN][entry.entry_id] = _entry_config(entry)
     async_register_http_view(hass)
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 
 
@@ -40,3 +41,16 @@ async def async_unload_entry(
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
     return True
+
+
+async def _async_update_listener(
+    hass: HomeAssistant,
+    entry: AlexaAssistBridgeConfigEntry,
+) -> None:
+    """Reload the config entry when options change."""
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
+def _entry_config(entry: AlexaAssistBridgeConfigEntry) -> dict:
+    """Merge setup data and options, with options taking precedence."""
+    return {**entry.data, **entry.options}

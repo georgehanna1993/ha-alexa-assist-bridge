@@ -21,13 +21,13 @@ Current scope:
 - Home Assistant custom integration scaffold
 - Local debug HTTP endpoint for testing Assist forwarding
 - Alexa request parsing and response formatting
+- Alexa web-service request validation
 - HACS-compatible repository layout
 - Alexa custom skill interaction model placeholder
 - Architecture and setup documentation
 
 Not yet implemented:
 
-- Full Alexa public request signature validation
 - Optional AWS Lambda bridge
 - Release packaging
 
@@ -111,6 +111,8 @@ During setup, Home Assistant asks for:
 - `Language`: usually `en`.
 - `Allow unsigned local debug requests`: enable for local testing only.
 
+You can change these later from **Settings -> Devices & services -> Alexa Assist Bridge -> Configure**.
+
 ## Local Testing
 
 After adding the integration, test from your local network before configuring Alexa.
@@ -156,6 +158,27 @@ High-level steps:
 3. Add a catch-all intent using `AMAZON.SearchQuery`.
 4. Configure the endpoint.
 5. Test with the Alexa simulator.
+
+Recommended first Alexa test path:
+
+1. In the Alexa Developer Console, create a **Custom** skill.
+2. Choose **Provision your own** backend.
+3. Set the invocation name to `nabu`.
+4. Import the interaction model from `skill/interaction-model/en-US.json`.
+5. Copy the Alexa Skill ID.
+6. In Home Assistant, open **Settings -> Devices & services -> Alexa Assist Bridge -> Configure** and paste the Alexa Skill ID exactly.
+7. Set the Alexa endpoint type to **HTTPS**.
+8. Use your Nabu Casa endpoint URL:
+
+   ```text
+   https://YOUR-NABU-CASA-REMOTE-URL.ui.nabu.casa/api/alexa_assist_bridge/YOUR_ENDPOINT_ID
+   ```
+
+9. Test in the Alexa simulator:
+
+   ```text
+   ask nabu what lights are on
+   ```
 
 Required values:
 

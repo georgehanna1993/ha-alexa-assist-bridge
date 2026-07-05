@@ -44,4 +44,22 @@ For the recommended no-AWS path, the endpoint will be your Home Assistant Cloud 
 https://YOUR-NABU-CASA-REMOTE-URL.ui.nabu.casa/api/alexa_assist_bridge/YOUR_ENDPOINT_ID
 ```
 
-The local debug endpoint exists for LAN testing, but public Alexa signature verification is not complete yet. Do not expose unsigned debug requests through Nabu Casa.
+## Skill ID
+
+After you create the skill, copy the Alexa Skill ID from the Alexa Developer Console and paste it into **Settings -> Devices & services -> Alexa Assist Bridge -> Configure**.
+
+The Skill ID must match exactly, for example:
+
+```text
+amzn1.ask.skill.YOUR-SKILL-ID
+```
+
+## HTTPS Endpoint Test
+
+Use the Alexa simulator with:
+
+```text
+ask nabu what lights are on
+```
+
+Alexa public requests are validated with the Alexa Skill ID, timestamp freshness, certificate-chain URL checks, certificate validity, and request signature verification. Keep unsigned debug requests for local LAN testing only.

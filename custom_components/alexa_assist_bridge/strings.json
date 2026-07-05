@@ -20,5 +20,20 @@
     "abort": {
       "already_configured": "Alexa Assist Bridge is already configured"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Alexa Assist Bridge",
+        "description": "Update the Alexa Skill ID, endpoint, Assist agent, language, and local debug setting.",
+        "data": {
+          "alexa_skill_id": "Alexa Skill ID",
+          "agent_id": "Conversation agent ID",
+          "endpoint_id": "Endpoint ID",
+          "language": "Language",
+          "allow_debug_requests": "Allow unsigned local debug requests"
+        }
+      }
+    }
   }
 }

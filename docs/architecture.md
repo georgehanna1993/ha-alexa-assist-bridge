@@ -31,9 +31,11 @@ Required checks:
 - Skill ID matches the configured Skill ID.
 - Timestamp is recent enough to prevent replay.
 - Signature certificate URL is valid for Alexa.
+- Signing certificate is valid for `echo-api.amazon.com`.
+- Certificate chain is trusted by the system CA store.
 - Request signature matches the body.
 
-The current implementation forwards local debug requests only when the debug header is present, the caller is loopback/private network, and debug mode is explicitly enabled. Public requests are rejected until full Alexa signature verification is complete.
+The current implementation forwards local debug requests only when the debug header is present, the caller is loopback/private network, and debug mode is explicitly enabled. Public Alexa requests must pass full request validation.
 
 ## Optional Lambda Path
 

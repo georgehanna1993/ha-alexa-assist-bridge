@@ -50,3 +50,13 @@ curl -X POST \
 ```
 
 Only keep unsigned debug requests enabled while testing locally.
+
+## Updating Options
+
+After creating the Alexa Skill, open:
+
+```text
+Settings -> Devices & services -> Alexa Assist Bridge -> Configure
+```
+
+Paste the Alexa Skill ID exactly as shown in the Alexa Developer Console.
