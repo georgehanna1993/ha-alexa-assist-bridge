@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Alexa Assist Bridge",
+        "description": "Create a bridge endpoint for an Alexa custom skill. Leave the Skill ID blank while developing, then add it before exposing the endpoint.",
+        "data": {
+          "alexa_skill_id": "Alexa Skill ID"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "Alexa Assist Bridge is already configured"
+    }
+  }
+}

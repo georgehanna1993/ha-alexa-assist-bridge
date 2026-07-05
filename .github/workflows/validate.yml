@@ -1,0 +1,30 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Compile custom component
+        run: python -m compileall custom_components
+
+      - name: Validate JSON files
+        run: |
+          python -m json.tool hacs.json > /dev/null
+          python -m json.tool custom_components/alexa_assist_bridge/manifest.json > /dev/null
+          python -m json.tool custom_components/alexa_assist_bridge/strings.json > /dev/null
+          python -m json.tool custom_components/alexa_assist_bridge/translations/en.json > /dev/null
+          python -m json.tool skill/interaction-model/en-US.json > /dev/null

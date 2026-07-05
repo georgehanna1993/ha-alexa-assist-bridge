@@ -1,0 +1,13 @@
+{
+  "domain": "alexa_assist_bridge",
+  "name": "Alexa Assist Bridge",
+  "after_dependencies": ["conversation", "http"],
+  "codeowners": ["@georgehanna1993"],
+  "config_flow": true,
+  "documentation": "https://github.com/georgehanna1993/ha-alexa-assist-bridge",
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/georgehanna1993/ha-alexa-assist-bridge/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
