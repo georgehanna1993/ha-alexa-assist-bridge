@@ -8,9 +8,11 @@
           "alexa_skill_id": "Alexa Skill ID",
           "agent_id": "Conversation agent ID",
           "assistant_name": "Assistant name",
+          "conversation_mode": "Conversation mode",
           "endpoint_id": "Endpoint ID",
           "language": "Language",
-          "allow_debug_requests": "Allow unsigned local debug requests"
+          "allow_debug_requests": "Allow unsigned local debug requests",
+          "spoken_response_prompt": "Optimize LLM prompts for spoken Alexa responses"
         }
       }
     },
@@ -30,9 +32,11 @@
           "alexa_skill_id": "Alexa Skill ID",
           "agent_id": "Conversation agent ID",
           "assistant_name": "Assistant name",
+          "conversation_mode": "Conversation mode",
           "endpoint_id": "Endpoint ID",
           "language": "Language",
-          "allow_debug_requests": "Allow unsigned local debug requests"
+          "allow_debug_requests": "Allow unsigned local debug requests",
+          "spoken_response_prompt": "Optimize LLM prompts for spoken Alexa responses"
         }
       }
     }

@@ -23,11 +23,18 @@ async def async_process_assist(
     conversation_id: str | None,
     agent_id: str | None,
     language: str | None,
+    assistant_name: str,
+    spoken_response_prompt: bool,
 ) -> AssistBridgeResult:
     """Send text to Home Assistant Assist and normalize the response."""
     result = await async_converse(
         hass=hass,
-        text=text,
+        text=_prepare_text_for_agent(
+            text=text,
+            agent_id=agent_id,
+            assistant_name=assistant_name,
+            spoken_response_prompt=spoken_response_prompt,
+        ),
         conversation_id=conversation_id,
         context=Context(),
         language=language,
@@ -57,3 +64,23 @@ def _extract_speech(result: dict) -> str:
         return ssml["speech"]
 
     return "Home Assistant processed the request."
+
+
+def _prepare_text_for_agent(
+    *,
+    text: str,
+    agent_id: str | None,
+    assistant_name: str,
+    spoken_response_prompt: bool,
+) -> str:
+    """Optionally wrap LLM requests with voice-assistant instructions."""
+    if not spoken_response_prompt or agent_id == "conversation.home_assistant":
+        return text
+
+    return (
+        f"You are {assistant_name}, a concise voice assistant inside Home Assistant. "
+        "The user is speaking through an Alexa skill, so answer naturally for speech. "
+        "Use Home Assistant context and tools when relevant. "
+        "Keep most answers to 1-3 short sentences unless the user asks for detail. "
+        f"User request: {text}"
+    )

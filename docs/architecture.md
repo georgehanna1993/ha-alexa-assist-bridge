@@ -7,7 +7,7 @@ Alexa Echo Device
   -> Alexa Custom Skill
   -> Home Assistant Cloud HTTPS URL
   -> Alexa Assist Bridge custom integration
-  -> Home Assistant Conversation API
+  -> Home Assistant Conversation API with Alexa session conversation ID
   -> Configured Conversation Agent
 ```
 
@@ -20,6 +20,8 @@ This is the preferred architecture for Nabu Casa users.
 - Home Assistant owns permissions and Assist pipelines.
 - HACS can install the Home Assistant side.
 - Users avoid port forwarding, reverse proxies, DuckDNS, and manual certificates.
+- Alexa sessions can remain open for follow-up turns.
+- Home Assistant remains the place where Gemini/OpenAI/Ollama/local agents are selected.
 
 ## Request Validation Requirement
 
@@ -49,6 +51,20 @@ The integration keeps lightweight runtime diagnostics for the most recent reques
 - short error message
 
 It does not store the full user utterance.
+
+## Conversation Behavior
+
+The bridge passes the Alexa `sessionId` to Home Assistant as the conversation ID. This allows conversation agents that support context to treat follow-up turns as part of the same conversation.
+
+Alexa session closing is configurable:
+
+- `assist`: respect Home Assistant's `continue_conversation` value.
+- `always`: keep Alexa listening after successful responses.
+- `never`: close after every response.
+
+For LLM-backed agents, the bridge can optionally wrap each request with concise spoken-assistant instructions. The wrapper is skipped for `conversation.home_assistant` so built-in local intents receive the original phrase.
+
+Live web search depends on the selected Home Assistant conversation agent or future optional tools.
 
 ## Optional Lambda Path
 

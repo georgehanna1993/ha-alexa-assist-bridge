@@ -24,11 +24,18 @@ from .const import (
     CONF_AGENT_ID,
     CONF_ALLOW_DEBUG_REQUESTS,
     CONF_ASSISTANT_NAME,
+    CONF_CONVERSATION_MODE,
     CONF_ENDPOINT_ID,
     CONF_LANGUAGE,
+    CONF_SPOKEN_RESPONSE_PROMPT,
+    CONVERSATION_MODE_ALWAYS,
+    CONVERSATION_MODE_ASSIST,
+    CONVERSATION_MODE_NEVER,
     DEFAULT_AGENT_ID,
     DEFAULT_ASSISTANT_NAME,
+    DEFAULT_CONVERSATION_MODE,
     DEFAULT_LANGUAGE,
+    DEFAULT_SPOKEN_RESPONSE_PROMPT,
     DOMAIN,
     SIGNAL_DIAGNOSTICS_UPDATED,
 )
@@ -115,7 +122,13 @@ class AlexaAssistBridgeView(HomeAssistantView):
 
         try:
             if is_stop_or_cancel_request(payload):
-                record_status(diagnostics, "ok", response_length=len("Goodbye."))
+                record_status(
+                    diagnostics,
+                    "ok",
+                    response_length=len("Goodbye."),
+                    should_end_session=True,
+                    conversation_id_present=bool(_conversation_id(payload)),
+                )
                 _notify_diagnostics_update(hass, runtime)
                 return web.json_response(alexa_plain_text_response("Goodbye."))
 
@@ -137,6 +150,13 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 conversation_id=_conversation_id(payload),
                 agent_id=config.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
                 language=config.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+                assistant_name=assistant_name,
+                spoken_response_prompt=bool(
+                    config.get(
+                        CONF_SPOKEN_RESPONSE_PROMPT,
+                        DEFAULT_SPOKEN_RESPONSE_PROMPT,
+                    )
+                ),
             )
         except Exception:
             _LOGGER.exception("Assist processing failed")
@@ -153,16 +173,26 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 status=500,
             )
 
+        should_end_session = _should_end_session(
+            conversation_mode=config.get(
+                CONF_CONVERSATION_MODE,
+                DEFAULT_CONVERSATION_MODE,
+            ),
+            assist_continue=result.continue_conversation,
+        )
         record_status(
             diagnostics,
             "ok",
             response_length=len(result.speech),
+            should_end_session=should_end_session,
+            conversation_id_present=bool(result.conversation_id),
         )
         _notify_diagnostics_update(hass, runtime)
         return web.json_response(
             alexa_plain_text_response(
                 result.speech,
-                should_end_session=not result.continue_conversation,
+                should_end_session=should_end_session,
+                reprompt_text=_reprompt_text(assistant_name),
             )
         )
 
@@ -194,6 +224,16 @@ class AlexaAssistBridgeDiagnosticsView(HomeAssistantView):
                 ),
                 "agent_id": config.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
                 "language": config.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+                "conversation_mode": config.get(
+                    CONF_CONVERSATION_MODE,
+                    DEFAULT_CONVERSATION_MODE,
+                ),
+                "spoken_response_prompt": bool(
+                    config.get(
+                        CONF_SPOKEN_RESPONSE_PROMPT,
+                        DEFAULT_SPOKEN_RESPONSE_PROMPT,
+                    )
+                ),
                 "allow_debug_requests": bool(
                     config.get(CONF_ALLOW_DEBUG_REQUESTS, False)
                 ),
@@ -230,3 +270,23 @@ def _conversation_id(payload: dict[str, Any]) -> str | None:
     if isinstance(session_id, str) and session_id:
         return session_id
     return None
+
+
+def _should_end_session(
+    *,
+    conversation_mode: str,
+    assist_continue: bool,
+) -> bool:
+    """Return whether Alexa should close the skill after this response."""
+    if conversation_mode == CONVERSATION_MODE_ALWAYS:
+        return False
+    if conversation_mode == CONVERSATION_MODE_NEVER:
+        return True
+    if conversation_mode != CONVERSATION_MODE_ASSIST:
+        return not assist_continue
+    return not assist_continue
+
+
+def _reprompt_text(assistant_name: str) -> str:
+    """Return a short Alexa reprompt for open sessions."""
+    return f"What else would you like to ask {assistant_name}?"

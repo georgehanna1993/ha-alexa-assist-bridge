@@ -73,9 +73,10 @@ def alexa_plain_text_response(
     text: str,
     *,
     should_end_session: bool = True,
+    reprompt_text: str | None = None,
 ) -> dict[str, Any]:
     """Build a standard Alexa plain text response."""
-    return {
+    response: dict[str, Any] = {
         "version": "1.0",
         "response": {
             "outputSpeech": {
@@ -85,6 +86,14 @@ def alexa_plain_text_response(
             "shouldEndSession": should_end_session,
         },
     }
+    if not should_end_session and reprompt_text:
+        response["response"]["reprompt"] = {
+            "outputSpeech": {
+                "type": "PlainText",
+                "text": _clean_speech_text(reprompt_text),
+            }
+        }
+    return response
 
 
 def alexa_help_response(assistant_name: str = "Nabu") -> dict[str, Any]:
@@ -92,6 +101,7 @@ def alexa_help_response(assistant_name: str = "Nabu") -> dict[str, Any]:
     return alexa_plain_text_response(
         f"Ask {assistant_name} a Home Assistant question, like what lights are on.",
         should_end_session=False,
+        reprompt_text="What would you like to ask?",
     )
 
 

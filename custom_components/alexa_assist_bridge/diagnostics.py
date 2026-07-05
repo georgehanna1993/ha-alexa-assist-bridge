@@ -16,6 +16,8 @@ def initial_diagnostics() -> dict[str, Any]:
         "last_error": None,
         "last_validation": None,
         "last_response_length": None,
+        "last_should_end_session": None,
+        "last_conversation_id_present": None,
     }
 
 
@@ -35,6 +37,8 @@ def record_request(
             "last_status": "received",
             "last_error": None,
             "last_response_length": None,
+            "last_should_end_session": None,
+            "last_conversation_id_present": None,
         }
     )
 
@@ -53,6 +57,8 @@ def record_status(
     *,
     error: str | None = None,
     response_length: int | None = None,
+    should_end_session: bool | None = None,
+    conversation_id_present: bool | None = None,
 ) -> None:
     """Record the final request status."""
     diagnostics.update(
@@ -60,5 +66,7 @@ def record_status(
             "last_status": status,
             "last_error": error,
             "last_response_length": response_length,
+            "last_should_end_session": should_end_session,
+            "last_conversation_id_present": conversation_id_present,
         }
     )

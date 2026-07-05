@@ -137,6 +137,23 @@ class AlexaHelperTest(unittest.TestCase):
             response["response"]["outputSpeech"]["text"],
             "Ask Home Helper a Home Assistant question, like what lights are on.",
         )
+        self.assertEqual(
+            response["response"]["reprompt"]["outputSpeech"]["text"],
+            "What would you like to ask?",
+        )
+
+    def test_reprompt_is_included_when_session_stays_open(self) -> None:
+        """Open Alexa sessions include a reprompt."""
+        response = alexa_plain_text_response(
+            "Sure.",
+            should_end_session=False,
+            reprompt_text="Anything else?",
+        )
+
+        self.assertEqual(
+            response["response"]["reprompt"]["outputSpeech"]["text"],
+            "Anything else?",
+        )
 
 
 if __name__ == "__main__":

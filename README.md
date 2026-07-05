@@ -22,6 +22,8 @@ Current scope:
 - Local debug HTTP endpoint for testing Assist forwarding
 - Alexa request parsing and response formatting
 - Alexa web-service request validation
+- Configurable Alexa conversation/session behavior
+- Optional spoken-response prompt optimization for LLM agents
 - Configurable assistant display name
 - Authenticated last-request diagnostics endpoint
 - Diagnostic status sensor in Home Assistant
@@ -111,11 +113,39 @@ During setup, Home Assistant asks for:
 - `Alexa Skill ID`: leave blank for local debug testing.
 - `Conversation agent ID`: usually `conversation.home_assistant`.
 - `Assistant name`: the name used in help responses, for example `Nabu`.
+- `Conversation mode`: choose how long Alexa keeps the skill open.
 - `Endpoint ID`: keep the generated value unless you know why you want to change it.
 - `Language`: usually `en`.
 - `Allow unsigned local debug requests`: enable for local testing only.
+- `Optimize LLM prompts for spoken Alexa responses`: enable for Gemini/OpenAI/Ollama-style agents.
 
 You can change these later from **Settings -> Devices & services -> Alexa Assist Bridge -> Configure**.
+
+### Conversation Mode
+
+The bridge supports three Alexa session behaviors:
+
+- `assist`: follow Home Assistant's `continue_conversation` response. This is the safest default.
+- `always`: keep Alexa listening after successful answers. This feels more like chat mode.
+- `never`: close the Alexa skill after every answer. This is best for quick one-shot commands.
+
+For a reasoning/chat experience, use an LLM conversation agent such as Gemini/OpenAI/Ollama and set conversation mode to `always` or `assist`.
+
+### Reasoning And Chat
+
+Alexa already supports basic smart-home commands. This bridge is most useful when Home Assistant Assist is backed by a real conversation agent:
+
+```text
+conversation.google_generative_ai
+conversation.openai_conversation
+conversation.ollama
+```
+
+The exact entity ID depends on the Home Assistant integration you install. After adding or changing conversation agents, restart Home Assistant if the new agent does not appear in the bridge configuration.
+
+When **Optimize LLM prompts for spoken Alexa responses** is enabled, the bridge wraps requests to non-default conversation agents with short voice-assistant instructions. This asks the model to answer naturally for speech, keep most responses concise, and use Home Assistant context/tools when relevant. The bridge does not apply this wrapper to `conversation.home_assistant`, so built-in Home Assistant intents still receive the exact user phrase.
+
+Important limitation: Gemini/OpenAI inside Home Assistant may not have the same live web-search access as the public Gemini or ChatGPT apps. For current events, sports schedules, or other live internet data, future versions may add optional tool integrations.
 
 ## Local Testing
 
@@ -165,7 +195,7 @@ assist_error
 invalid_json
 ```
 
-The sensor attributes include the last request type, intent name, validation result, short error, and response length. It does not store the full spoken query.
+The sensor attributes include the last request type, intent name, validation result, short error, response length, session-continuation state, and whether Home Assistant returned a conversation ID. It does not store the full spoken query.
 
 The integration also exposes an authenticated diagnostics endpoint for troubleshooting.
 

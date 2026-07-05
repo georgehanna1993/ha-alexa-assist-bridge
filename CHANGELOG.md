@@ -13,3 +13,6 @@ This project follows Semantic Versioning.
 - Add options flow for updating Skill ID, endpoint ID, Assist agent, language, and debug mode.
 - Add configurable assistant display name and authenticated last-request diagnostics.
 - Add diagnostic status sensor for the latest Alexa bridge request.
+- Add configurable Alexa conversation/session mode.
+- Add optional spoken-response prompt optimization for LLM conversation agents.
+- Include session-continuation diagnostics in the status sensor and diagnostics endpoint.

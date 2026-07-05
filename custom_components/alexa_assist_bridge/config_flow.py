@@ -16,12 +16,17 @@ from .const import (
     CONF_ALLOW_DEBUG_REQUESTS,
     CONF_AGENT_ID,
     CONF_ASSISTANT_NAME,
+    CONF_CONVERSATION_MODE,
     CONF_ENDPOINT_ID,
     CONF_LANGUAGE,
+    CONF_SPOKEN_RESPONSE_PROMPT,
+    CONVERSATION_MODES,
     DEFAULT_AGENT_ID,
     DEFAULT_ALLOW_DEBUG_REQUESTS,
     DEFAULT_ASSISTANT_NAME,
+    DEFAULT_CONVERSATION_MODE,
     DEFAULT_LANGUAGE,
+    DEFAULT_SPOKEN_RESPONSE_PROMPT,
     DOMAIN,
 )
 
@@ -51,8 +56,12 @@ class AlexaAssistBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_ALLOW_DEBUG_REQUESTS: user_input[CONF_ALLOW_DEBUG_REQUESTS],
                 CONF_AGENT_ID: user_input[CONF_AGENT_ID].strip(),
                 CONF_ASSISTANT_NAME: user_input[CONF_ASSISTANT_NAME].strip(),
+                CONF_CONVERSATION_MODE: user_input[CONF_CONVERSATION_MODE],
                 CONF_ENDPOINT_ID: user_input[CONF_ENDPOINT_ID].strip(),
                 CONF_LANGUAGE: user_input[CONF_LANGUAGE].strip(),
+                CONF_SPOKEN_RESPONSE_PROMPT: user_input[
+                    CONF_SPOKEN_RESPONSE_PROMPT
+                ],
             }
 
             return self.async_create_entry(title="Alexa Assist Bridge", data=data)
@@ -69,6 +78,10 @@ class AlexaAssistBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     default=DEFAULT_ASSISTANT_NAME,
                 ): str,
                 vol.Required(
+                    CONF_CONVERSATION_MODE,
+                    default=DEFAULT_CONVERSATION_MODE,
+                ): vol.In(CONVERSATION_MODES),
+                vol.Required(
                     CONF_ENDPOINT_ID,
                     default=self._suggested_endpoint_id,
                 ): str,
@@ -79,6 +92,10 @@ class AlexaAssistBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(
                     CONF_ALLOW_DEBUG_REQUESTS,
                     default=DEFAULT_ALLOW_DEBUG_REQUESTS,
+                ): bool,
+                vol.Required(
+                    CONF_SPOKEN_RESPONSE_PROMPT,
+                    default=DEFAULT_SPOKEN_RESPONSE_PROMPT,
                 ): bool,
             }
         )
@@ -122,8 +139,12 @@ class AlexaAssistBridgeOptionsFlow(config_entries.OptionsFlow):
                     CONF_ALLOW_DEBUG_REQUESTS: user_input[CONF_ALLOW_DEBUG_REQUESTS],
                     CONF_AGENT_ID: user_input[CONF_AGENT_ID].strip(),
                     CONF_ASSISTANT_NAME: user_input[CONF_ASSISTANT_NAME].strip(),
+                    CONF_CONVERSATION_MODE: user_input[CONF_CONVERSATION_MODE],
                     CONF_ENDPOINT_ID: user_input[CONF_ENDPOINT_ID].strip(),
                     CONF_LANGUAGE: user_input[CONF_LANGUAGE].strip(),
+                    CONF_SPOKEN_RESPONSE_PROMPT: user_input[
+                        CONF_SPOKEN_RESPONSE_PROMPT
+                    ],
                 },
             )
 
@@ -145,6 +166,13 @@ class AlexaAssistBridgeOptionsFlow(config_entries.OptionsFlow):
                     ),
                 ): str,
                 vol.Required(
+                    CONF_CONVERSATION_MODE,
+                    default=current.get(
+                        CONF_CONVERSATION_MODE,
+                        DEFAULT_CONVERSATION_MODE,
+                    ),
+                ): vol.In(CONVERSATION_MODES),
+                vol.Required(
                     CONF_ENDPOINT_ID,
                     default=current[CONF_ENDPOINT_ID],
                 ): str,
@@ -157,6 +185,13 @@ class AlexaAssistBridgeOptionsFlow(config_entries.OptionsFlow):
                     default=current.get(
                         CONF_ALLOW_DEBUG_REQUESTS,
                         DEFAULT_ALLOW_DEBUG_REQUESTS,
+                    ),
+                ): bool,
+                vol.Required(
+                    CONF_SPOKEN_RESPONSE_PROMPT,
+                    default=current.get(
+                        CONF_SPOKEN_RESPONSE_PROMPT,
+                        DEFAULT_SPOKEN_RESPONSE_PROMPT,
                     ),
                 ): bool,
             }

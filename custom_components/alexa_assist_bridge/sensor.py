@@ -15,11 +15,15 @@ from .const import (
     CONF_AGENT_ID,
     CONF_ALLOW_DEBUG_REQUESTS,
     CONF_ASSISTANT_NAME,
+    CONF_CONVERSATION_MODE,
     CONF_ENDPOINT_ID,
     CONF_LANGUAGE,
+    CONF_SPOKEN_RESPONSE_PROMPT,
     DEFAULT_AGENT_ID,
     DEFAULT_ASSISTANT_NAME,
+    DEFAULT_CONVERSATION_MODE,
     DEFAULT_LANGUAGE,
+    DEFAULT_SPOKEN_RESPONSE_PROMPT,
     DOMAIN,
     SIGNAL_DIAGNOSTICS_UPDATED,
 )
@@ -69,6 +73,16 @@ class AlexaAssistBridgeStatusSensor(SensorEntity):
             ),
             "agent_id": config.get(CONF_AGENT_ID, DEFAULT_AGENT_ID),
             "language": config.get(CONF_LANGUAGE, DEFAULT_LANGUAGE),
+            "conversation_mode": config.get(
+                CONF_CONVERSATION_MODE,
+                DEFAULT_CONVERSATION_MODE,
+            ),
+            "spoken_response_prompt": bool(
+                config.get(
+                    CONF_SPOKEN_RESPONSE_PROMPT,
+                    DEFAULT_SPOKEN_RESPONSE_PROMPT,
+                )
+            ),
             "endpoint_id": config.get(CONF_ENDPOINT_ID),
             "allow_debug_requests": bool(
                 config.get(CONF_ALLOW_DEBUG_REQUESTS, False)

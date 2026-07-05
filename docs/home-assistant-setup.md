@@ -32,6 +32,38 @@ Assist can only control and reason about what Home Assistant allows it to use.
 
 Review exposed entities in Home Assistant and keep the list intentional.
 
+## Choosing A Conversation Agent
+
+For basic Home Assistant intents, use:
+
+```text
+conversation.home_assistant
+```
+
+For reasoning and chat, install and configure a Home Assistant conversation integration such as Google Generative AI Conversation, OpenAI Conversation, Ollama, or another local LLM provider. Then set `Conversation agent ID` to that entity, for example:
+
+```text
+conversation.google_generative_ai
+```
+
+If the new conversation agent does not appear after installation, restart Home Assistant and check the bridge options again.
+
+## Conversation Mode
+
+Use one of:
+
+- `assist`: follow the conversation agent's `continue_conversation` value.
+- `always`: keep Alexa listening after successful answers.
+- `never`: close the Alexa session after every answer.
+
+For an Alexa+-like chat experience, start with `always`. You can still say `stop` or `cancel` to close the skill.
+
+## Spoken LLM Prompting
+
+When enabled, the bridge adds voice-oriented instructions before sending a request to non-default LLM agents. This helps Gemini/OpenAI/Ollama answer briefly and naturally through Alexa.
+
+The bridge intentionally skips this wrapper for `conversation.home_assistant`, because built-in Home Assistant intents work best with the exact phrase the user said.
+
 ## Local Debug Test
 
 The integration supports local unsigned debug requests so you can verify Assist forwarding before configuring Alexa.
@@ -61,7 +93,7 @@ Settings -> Devices & services -> Alexa Assist Bridge -> Configure
 
 Paste the Alexa Skill ID exactly as shown in the Alexa Developer Console.
 
-You can also update the assistant display name here. This controls help text only; Alexa recognition is controlled by the invocation name in the Alexa Developer Console.
+You can also update the assistant display name, conversation agent, conversation mode, and spoken-response prompt setting here. The assistant display name controls help text only; Alexa recognition is controlled by the invocation name in the Alexa Developer Console.
 
 ## Diagnostics
 
