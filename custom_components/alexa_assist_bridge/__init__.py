@@ -11,6 +11,15 @@ from .http import async_register_http_view
 type AlexaAssistBridgeConfigEntry = ConfigEntry
 
 
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up Alexa Assist Bridge."""
+    del config
+
+    hass.data.setdefault(DOMAIN, {})
+    async_register_http_view(hass)
+    return True
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: AlexaAssistBridgeConfigEntry,
