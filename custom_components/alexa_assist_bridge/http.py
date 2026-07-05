@@ -193,6 +193,7 @@ class AlexaAssistBridgeView(HomeAssistantView):
                 result.speech,
                 should_end_session=should_end_session,
                 reprompt_text=_reprompt_text(assistant_name),
+                follow_up_text=_follow_up_text(),
             )
         )
 
@@ -290,3 +291,8 @@ def _should_end_session(
 def _reprompt_text(assistant_name: str) -> str:
     """Return a short Alexa reprompt for open sessions."""
     return f"What else would you like to ask {assistant_name}?"
+
+
+def _follow_up_text() -> str:
+    """Return the short spoken cue that keeps chat mode feeling open."""
+    return "Anything else?"

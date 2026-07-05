@@ -130,6 +130,7 @@ The bridge supports three Alexa session behaviors:
 - `never`: close the Alexa skill after every answer. This is best for quick one-shot commands.
 
 For a reasoning/chat experience, use an LLM conversation agent such as Gemini/OpenAI/Ollama and set conversation mode to `always` or `assist`.
+When Alexa keeps the session open, the bridge adds a short spoken cue such as `Anything else?` after successful answers so users have a natural moment to continue.
 
 ### Reasoning And Chat
 

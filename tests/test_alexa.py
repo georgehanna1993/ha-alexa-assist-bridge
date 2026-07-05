@@ -155,6 +155,32 @@ class AlexaHelperTest(unittest.TestCase):
             "Anything else?",
         )
 
+    def test_follow_up_is_spoken_when_session_stays_open(self) -> None:
+        """Open Alexa sessions can include an audible follow-up cue."""
+        response = alexa_plain_text_response(
+            "The living room is warm because the blinds are open.",
+            should_end_session=False,
+            follow_up_text="Anything else?",
+        )
+
+        self.assertEqual(
+            response["response"]["outputSpeech"]["text"],
+            "The living room is warm because the blinds are open. Anything else?",
+        )
+
+    def test_follow_up_is_not_spoken_when_session_closes(self) -> None:
+        """Closed sessions should not append the follow-up cue."""
+        response = alexa_plain_text_response(
+            "Done.",
+            should_end_session=True,
+            follow_up_text="Anything else?",
+        )
+
+        self.assertEqual(
+            response["response"]["outputSpeech"]["text"],
+            "Done.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

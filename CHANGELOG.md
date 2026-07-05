@@ -16,3 +16,4 @@ This project follows Semantic Versioning.
 - Add configurable Alexa conversation/session mode.
 - Add optional spoken-response prompt optimization for LLM conversation agents.
 - Include session-continuation diagnostics in the status sensor and diagnostics endpoint.
+- Add a short spoken follow-up cue for open Alexa chat sessions.

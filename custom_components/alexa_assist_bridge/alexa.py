@@ -74,14 +74,20 @@ def alexa_plain_text_response(
     *,
     should_end_session: bool = True,
     reprompt_text: str | None = None,
+    follow_up_text: str | None = None,
 ) -> dict[str, Any]:
     """Build a standard Alexa plain text response."""
+    speech_text = _speech_with_follow_up(
+        text=text,
+        should_end_session=should_end_session,
+        follow_up_text=follow_up_text,
+    )
     response: dict[str, Any] = {
         "version": "1.0",
         "response": {
             "outputSpeech": {
                 "type": "PlainText",
-                "text": _clean_speech_text(text),
+                "text": _clean_speech_text(speech_text),
             },
             "shouldEndSession": should_end_session,
         },
@@ -122,6 +128,25 @@ def _clean_speech_text(text: str) -> str:
     if not speech:
         return "I did not get a response from Home Assistant."
     return speech[:8000]
+
+
+def _speech_with_follow_up(
+    *,
+    text: str,
+    should_end_session: bool,
+    follow_up_text: str | None,
+) -> str:
+    """Append a short spoken cue when Alexa should keep listening."""
+    if should_end_session or not follow_up_text:
+        return text
+
+    speech = text.strip()
+    follow_up = follow_up_text.strip()
+    if not speech or not follow_up:
+        return text
+    if speech.lower().endswith(follow_up.lower()):
+        return speech
+    return f"{speech} {follow_up}"
 
 
 def _query_with_prefix(prefix: str, query: str) -> str:
